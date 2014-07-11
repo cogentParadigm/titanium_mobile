@@ -81,6 +81,16 @@
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event 
 {
+	NSLog(@"CURRENT PAGE: %d", [self currentPage]);
+	NSLog(@"POINT %@", NSStringFromCGPoint(point));
+	if ([self currentPage] == 0 && point.x > 280 && point.y < 40) {
+		NSLog(@"FIRING EVENT");
+		[self.proxy fireEvent:@"closemenu"];
+	}
+	UIView *child = nil;
+	if ((child = [super hitTest:point withEvent:event]) == self) return [self scrollview];
+	return child;
+    
     id value = [self.proxy valueForKey:@"hitRect"];
 
     if (value != nil) 
