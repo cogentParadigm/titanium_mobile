@@ -94,6 +94,11 @@ public class TiUIScrollableView extends TiUIView
 		});
 
 		pager.setAdapter(adapter);
+		pager.setOffscreenPageLimit(adapter.getCount());
+		pager.setPadding(150, 0, 150, 0);
+		pager.setPageMargin(20);
+		pager.setClipChildren(false);
+		pager.setClipToPadding(false);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
 		{
 			private boolean isValidScroll = false;
@@ -132,7 +137,7 @@ public class TiUIScrollableView extends TiUIView
 
 					// If we don't use this state variable to check if it's a valid
 					// scroll, this event will fire when the view is first created
-					// because on creation, the scroll state is initialized to 
+					// because on creation, the scroll state is initialized to
 					// `idle` and this handler is called.
 					isValidScroll = false;
 				} else if (scrollState == ViewPager.SCROLL_STATE_SETTLING) {
@@ -272,7 +277,7 @@ public class TiUIScrollableView extends TiUIView
 	{
 		if (d.containsKey(TiC.PROPERTY_VIEWS)) {
 			setViews(d.get(TiC.PROPERTY_VIEWS));
-		} 
+		}
 
 		if (d.containsKey(TiC.PROPERTY_CURRENT_PAGE)) {
 			int page = TiConvert.toInt(d, TiC.PROPERTY_CURRENT_PAGE);
@@ -290,7 +295,7 @@ public class TiUIScrollableView extends TiUIView
 		if (d.containsKey(TiC.PROPERTY_SCROLLING_ENABLED)) {
 			mEnabled = TiConvert.toBoolean(d, TiC.PROPERTY_SCROLLING_ENABLED);
 		}
-		
+
 		if (d.containsKey(TiC.PROPERTY_OVER_SCROLL_MODE)) {
 			if (Build.VERSION.SDK_INT >= 9) {
 				mPager.setOverScrollMode(TiConvert.toInt(d.get(TiC.PROPERTY_OVER_SCROLL_MODE), View.OVER_SCROLL_ALWAYS));
@@ -488,6 +493,15 @@ public class TiUIScrollableView extends TiUIView
 		{
 			mViewProxies = viewProxies;
 		}
+
+ 		@Override
+ 		public float getPageWidth(int position) {
+			return 1f;
+			//if (mViewProxies.size() > 2) return 1f;
+ 			//int mOrientation = mActivity.getResources().getConfiguration().orientation;
+ 			//if (position == 0) return (mOrientation == 1) ? 0.8f : 0.9f;
+ 			//return 1f;
+ 		}
 
 		@Override
 		public void destroyItem(View container, int position, Object object)
