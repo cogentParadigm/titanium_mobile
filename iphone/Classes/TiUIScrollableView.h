@@ -29,6 +29,7 @@
     BOOL enforceCacheRecalculation;
     int cacheSize;
     BOOL pageChanged;
+    BOOL isVertical;
 }
 
 #pragma mark - Titanium Internal Use Only
