@@ -52,6 +52,8 @@ public class TiUIScrollableView extends TiUIView
 
 	private int mCurIndex = 0;
 	private boolean mEnabled = true;
+	private boolean mCarouselMode = false;
+	private boolean mVerticalMode = false;
 
 	public TiUIScrollableView(ScrollableViewProxy proxy)
 	{
@@ -60,6 +62,7 @@ public class TiUIScrollableView extends TiUIView
 		mViews = new ArrayList<TiViewProxy>();
 		mAdapter = new ViewPagerAdapter(activity, mViews);
 		mPager = buildViewPager(activity, mAdapter);
+		mPager.setPageTransformer(true, new VerticalPageTransformer());
 
 		mContainer = new TiViewPagerLayout(activity);
 		mContainer.addView(mPager, buildFillLayoutParams());
@@ -70,6 +73,34 @@ public class TiUIScrollableView extends TiUIView
 		setNativeView(mContainer);
 	}
 
+	private class VerticalPageTransformer implements ViewPager.PageTransformer {
+
+		@Override
+		public void transformPage(View view, float position) {
+		if (mVerticalMode) {
+			int pageWidth = view.getWidth();
+			int pageHeight = view.getHeight();
+
+			if (position < -1) { // [-Infinity,-1)
+				// This page is way off-screen to the left.
+				view.setAlpha(0);
+			} else if (position <= 1) { // [-1,1]
+				view.setAlpha(1);
+				// Counteract the default slide transition
+				view.setTranslationX(pageWidth * -position);
+
+				//set Y position to swipe in from top
+				float yPosition = position * pageHeight;
+				view.setTranslationY(yPosition);
+
+				} else { // (1,+Infinity]
+					// This page is way off-screen to the right.
+					view.setAlpha(0);
+				}
+			}
+		}
+	}
+
 	private ViewPager buildViewPager(Context context, ViewPagerAdapter adapter)
 	{
 		ViewPager pager = (new ViewPager(context)
@@ -77,6 +108,7 @@ public class TiUIScrollableView extends TiUIView
 			@Override
 			public boolean onTouchEvent(MotionEvent event) {
 				if (mEnabled) {
+					if (mVerticalMode) event.setLocation(event.getY(), event.getX());
 					return super.onTouchEvent(event);
 				}
 
@@ -86,6 +118,7 @@ public class TiUIScrollableView extends TiUIView
 			@Override
 			public boolean onInterceptTouchEvent(MotionEvent event) {
 				if (mEnabled) {
+					if (mVerticalMode) event.setLocation(event.getY(), event.getX());
 					return super.onInterceptTouchEvent(event);
 				}
 
@@ -94,6 +127,7 @@ public class TiUIScrollableView extends TiUIView
 		});
 
 		pager.setAdapter(adapter);
+		pager.setOffscreenPageLimit(5);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener()
 		{
 			private boolean isValidScroll = false;
@@ -132,7 +166,7 @@ public class TiUIScrollableView extends TiUIView
 
 					// If we don't use this state variable to check if it's a valid
 					// scroll, this event will fire when the view is first created
-					// because on creation, the scroll state is initialized to 
+					// because on creation, the scroll state is initialized to
 					// `idle` and this handler is called.
 					isValidScroll = false;
 				} else if (scrollState == ViewPager.SCROLL_STATE_SETTLING) {
@@ -272,7 +306,7 @@ public class TiUIScrollableView extends TiUIView
 	{
 		if (d.containsKey(TiC.PROPERTY_VIEWS)) {
 			setViews(d.get(TiC.PROPERTY_VIEWS));
-		} 
+		}
 
 		if (d.containsKey(TiC.PROPERTY_CURRENT_PAGE)) {
 			int page = TiConvert.toInt(d, TiC.PROPERTY_CURRENT_PAGE);
@@ -290,12 +324,27 @@ public class TiUIScrollableView extends TiUIView
 		if (d.containsKey(TiC.PROPERTY_SCROLLING_ENABLED)) {
 			mEnabled = TiConvert.toBoolean(d, TiC.PROPERTY_SCROLLING_ENABLED);
 		}
-		
+
 		if (d.containsKey(TiC.PROPERTY_OVER_SCROLL_MODE)) {
 			if (Build.VERSION.SDK_INT >= 9) {
 				mPager.setOverScrollMode(TiConvert.toInt(d.get(TiC.PROPERTY_OVER_SCROLL_MODE), View.OVER_SCROLL_ALWAYS));
 			}
 		}
+
+		if (d.containsKey("carouselMode")) {
+			mCarouselMode = TiConvert.toBoolean(d, "carouselMode");
+			if (mCarouselMode) {
+				mPager.setPadding(150, 0, 150, 0);
+				mPager.setPageMargin(20);
+				mPager.setClipChildren(false);
+				mPager.setClipToPadding(false);
+			}
+		}
+
+		if (d.containsKey("isVertical")) {
+			mVerticalMode = TiConvert.toBoolean(d, "isVertical");
+		}
+
 
 		super.processProperties(d);
 

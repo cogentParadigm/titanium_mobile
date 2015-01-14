@@ -29,6 +29,7 @@
     BOOL enforceCacheRecalculation;
     NSInteger cacheSize;
     BOOL pageChanged;
+    BOOL isVertical;
 }
 
 #pragma mark - Titanium Internal Use Only
