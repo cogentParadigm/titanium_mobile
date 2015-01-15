@@ -34,7 +34,7 @@
 -(void)popGestureStateHandler:(UIGestureRecognizer *)recognizer
 {
     UIGestureRecognizerState curState = recognizer.state;
-    
+
     switch (curState) {
         case UIGestureRecognizerStateBegan:
             transitionWithGesture = YES;
@@ -47,7 +47,7 @@
         default:
             break;
     }
-    
+
 }
 
 #pragma mark - TiOrientationController
@@ -91,7 +91,7 @@
         navController.delegate = self;
         [TiUtils configureController:navController withObject:self];
         if ([TiUtils isIOS7OrGreater]) {
-            [navController.interactivePopGestureRecognizer addTarget:self action:@selector(popGestureStateHandler:)];
+            navController.interactivePopGestureRecognizer.enabled = NO;
         }
     }
     return navController;
@@ -101,7 +101,7 @@
 {
 	TiWindowProxy *window = [args objectAtIndex:0];
 	ENSURE_TYPE(window,TiWindowProxy);
-    
+
     if (window == rootWindow) {
         [rootWindow windowWillOpen];
         [rootWindow windowDidOpen];
@@ -119,7 +119,7 @@
         [window open:args];
         return;
     }
-    
+
 	[[[TiApp app] controller] dismissKeyboard];
 	TiThreadPerformOnMainThread(^{
 		[self pushOnUIThread:args];
@@ -204,7 +204,7 @@
     transitionWithGesture = NO;
     if (current != nil) {
         UIViewController* oldController = [current hostingController];
-        
+
         if (![[navController viewControllers] containsObject:oldController]) {
             [current setTab:nil];
             [current setParentOrientationController:nil];
@@ -252,7 +252,7 @@
 	}
 	TiWindowProxy *window = [args objectAtIndex:0];
 	BOOL animated = args!=nil && [args count] > 1 ? [TiUtils boolValue:@"animated" properties:[args objectAtIndex:1] def:YES] : YES;
-    
+
     [navController pushViewController:[window hostingController] animated:animated];
 }
 
@@ -264,7 +264,7 @@
 		return;
 	}
 	TiWindowProxy *window = [args objectAtIndex:0];
-    
+
     if (window == current) {
         BOOL animated = args!=nil && [args count] > 1 ? [TiUtils boolValue:@"animated" properties:[args objectAtIndex:1] def:YES] : YES;
         [navController popViewControllerAnimated:animated];
@@ -272,21 +272,21 @@
     else {
         [self closeWindow:window animated:NO];
     }
-    
+
 }
 
 - (void)closeWindow:(TiWindowProxy*)window animated:(BOOL)animated
 {
     [window retain];
     UIViewController *windowController = [[window hostingController] retain];
-    
+
 	// Manage the navigation controller stack
 	NSMutableArray* newControllerStack = [NSMutableArray arrayWithArray:[navController viewControllers]];
 	[newControllerStack removeObject:windowController];
 	[navController setViewControllers:newControllerStack animated:animated];
     [window setTab:nil];
 	[window setParentOrientationController:nil];
-	
+
 	// for this to work right, we need to sure that we always have the tab close the window
 	// and not let the window simply close by itself. this will ensure that we tell the
 	// tab that we're doing that
@@ -302,7 +302,7 @@
             [navController setDelegate:nil];
             NSArray* currentControllers = [navController viewControllers];
             [navController setViewControllers:[NSArray array]];
-            
+
             for (UIViewController* viewController in currentControllers) {
                 TiWindowProxy* win = (TiWindowProxy *)[(TiViewController*)viewController proxy];
                 [win setTab:nil];
@@ -347,7 +347,7 @@
         [navController viewDidDisappear:animated];
     }
     [super viewDidDisappear:animated];
-    
+
 }
 
 -(BOOL) hidesStatusBar
@@ -448,7 +448,7 @@
 -(void)willChangeSize
 {
 	[super willChangeSize];
-	
+
 	//TODO: Shouldn't this be not through UI? Shouldn't we retain the windows ourselves?
 	for (UIViewController * thisController in [navController viewControllers])
 	{
