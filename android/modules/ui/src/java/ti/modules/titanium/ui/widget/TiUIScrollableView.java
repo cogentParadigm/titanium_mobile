@@ -290,7 +290,7 @@ public class TiUIScrollableView extends TiUIView
 		if (d.containsKey(TiC.PROPERTY_SCROLLING_ENABLED)) {
 			mEnabled = TiConvert.toBoolean(d, TiC.PROPERTY_SCROLLING_ENABLED);
 		}
-		
+
 		if (d.containsKey(TiC.PROPERTY_OVER_SCROLL_MODE)) {
 			if (Build.VERSION.SDK_INT >= 9) {
 				mPager.setOverScrollMode(TiConvert.toInt(d.get(TiC.PROPERTY_OVER_SCROLL_MODE), View.OVER_SCROLL_ALWAYS));
@@ -301,7 +301,7 @@ public class TiUIScrollableView extends TiUIView
 			int cacheSize = TiConvert.toInt(d.get("cacheSize"));
 			mPager.setOffscreenPageLimit(cacheSize);
 		}
-		
+
 		super.processProperties(d);
 	}
 
@@ -533,9 +533,19 @@ public class TiUIScrollableView extends TiUIView
 	public static class ViewPagerAdapter extends PagerAdapter
 	{
 		private final ArrayList<TiViewProxy> mViewProxies;
+		private final Activity mActivity;
 		public ViewPagerAdapter(Activity activity, ArrayList<TiViewProxy> viewProxies)
 		{
 			mViewProxies = viewProxies;
+			mActivity = activity;
+		}
+
+		@Override
+		public float getPageWidth(int position) {
+			if (mViewProxies.size() > 2) return 1f;
+			int mOrientation = mActivity.getResources().getConfiguration().orientation;
+			if (position == 0) return (mOrientation == 1) ? 0.8f : 0.9f;
+			return 1f;
 		}
 
 		@Override
