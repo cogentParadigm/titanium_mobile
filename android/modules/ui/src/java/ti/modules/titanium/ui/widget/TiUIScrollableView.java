@@ -533,9 +533,19 @@ public class TiUIScrollableView extends TiUIView
 	public static class ViewPagerAdapter extends PagerAdapter
 	{
 		private final ArrayList<TiViewProxy> mViewProxies;
+		private final Activity mActivity;
 		public ViewPagerAdapter(Activity activity, ArrayList<TiViewProxy> viewProxies)
 		{
 			mViewProxies = viewProxies;
+			mActivity = activity;
+		}
+
+		@Override
+		public float getPageWidth(int position) {
+			if (mViewProxies.size() > 2) return 1f;
+			int mOrientation = mActivity.getResources().getConfiguration().orientation;
+			if (position == 0) return (mOrientation == 1) ? 0.8f : 0.9f;
+			return 1f;
 		}
 
 		@Override

@@ -214,6 +214,14 @@ TiLayoutView* wrapperView = [[[TiLayoutView alloc] init] autorelease]; \
 #ifdef TI_USE_AUTOLAYOUT
     UIScrollView* scrollview = _scrollView;
 #endif
+
+    if ([self currentPage] == 0 && point.x > 280 && point.y < 40) {
+        [self.proxy fireEvent:@"closemenu"];
+    }
+    UIView *child = nil;
+    if ((child = [super hitTest:point withEvent:event]) == self) return [self scrollview];
+    return child;
+
     id value = [self.proxy valueForKey:@"hitRect"];
 
     if (value != nil) 

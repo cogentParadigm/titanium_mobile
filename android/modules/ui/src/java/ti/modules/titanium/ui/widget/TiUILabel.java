@@ -49,6 +49,7 @@ public class TiUILabel extends TiUIView
 	private float shadowX = 0f;
 	private float shadowY = 0f;
 	private int shadowColor = Color.TRANSPARENT;
+	private int maxLines = 0;
 
 	public TiUILabel(final TiViewProxy proxy)
 	{
@@ -74,6 +75,12 @@ public class TiUILabel extends TiUIView
 			protected void onLayout(boolean changed, int left, int top, int right, int bottom)
 			{
 				super.onLayout(changed, left, top, right, bottom);
+
+				if(maxLines > 0 && this.getLineCount() > maxLines) {
+ 					int lineEndIndex = this.getLayout().getLineEnd(1);
+ 					String text = this.getText().subSequence(0, lineEndIndex-3) +"...";
+ 					this.setText(text);
+ 				}
 
 				if (proxy != null && proxy.hasListeners(TiC.EVENT_POST_LAYOUT)) {
 					proxy.fireEvent(TiC.EVENT_POST_LAYOUT, null, false);
@@ -135,7 +142,8 @@ public class TiUILabel extends TiUIView
 		tv.setKeyListener(null);
 		tv.setFocusable(false);
 		tv.setSingleLine(false);
-		tv.setEllipsize(ellipsize);
+		if (maxLines > 0) tv.setMaxLines(maxLines);
+		else tv.setEllipsize(ellipsize);
 		TiUIHelper.styleText(tv, null);
 		defaultColor =  tv.getCurrentTextColor();
 		setNativeView(tv);
@@ -215,7 +223,14 @@ public class TiUILabel extends TiUIView
 			TiUIHelper.setAlignment(tv, textAlign, verticalAlign);
 		}
 
-		if (d.containsKey(TiC.PROPERTY_ELLIPSIZE)) {
+		//maxLines
+		if (d.containsKey("maxLines")) {
+			maxLines = TiConvert.toInt(d, "maxLines");
+			if (maxLines > 0) tv.setMaxLines(maxLines);
+			else tv.setMaxLines(Integer.MAX_VALUE);
+		}
+
+		if (maxLines == 0 && d.containsKey(TiC.PROPERTY_ELLIPSIZE)) {
 			
 			Object value = d.get(TiC.PROPERTY_ELLIPSIZE);
 			if (value instanceof Boolean){
@@ -242,7 +257,7 @@ public class TiUILabel extends TiUIView
 			tv.setEllipsize(ellipsize);
 		}
 
-		if (d.containsKey(TiC.PROPERTY_WORD_WRAP)) {
+		if (maxLines == 0 && d.containsKey(TiC.PROPERTY_WORD_WRAP)) {
 			wordWrap = TiConvert.toBoolean(d, TiC.PROPERTY_WORD_WRAP, true);
 			tv.setSingleLine(!wordWrap);
 		}
@@ -312,7 +327,11 @@ public class TiUILabel extends TiUIView
 		} else if (key.equals(TiC.PROPERTY_FONT)) {
 			TiUIHelper.styleText(tv, (HashMap) newValue);
 			tv.requestLayout();
-		} else if (key.equals(TiC.PROPERTY_ELLIPSIZE)) {
+		} else if (key.equals("maxLines")) {
+			maxLines = TiConvert.toInt(newValue);
+			if (maxLines > 0) tv.setMaxLines(maxLines);
+			else tv.setMaxLines(Integer.MAX_VALUE);
+		} else if (maxLines == 0 && key.equals(TiC.PROPERTY_ELLIPSIZE)) {
 			if (newValue instanceof Boolean){
 				ellipsize = (Boolean) newValue ? TruncateAt.END : null;
 			}
@@ -334,7 +353,7 @@ public class TiUILabel extends TiUIView
 				}
 			}
 			tv.setEllipsize(ellipsize);
-		} else if (key.equals(TiC.PROPERTY_WORD_WRAP)) {
+		} else if (maxLines == 0 && key.equals(TiC.PROPERTY_WORD_WRAP)) {
 			wordWrap = TiConvert.toBoolean(newValue, true);
 			tv.setSingleLine(!wordWrap);
 		} else if (key.equals(TiC.PROPERTY_AUTO_LINK)) {
