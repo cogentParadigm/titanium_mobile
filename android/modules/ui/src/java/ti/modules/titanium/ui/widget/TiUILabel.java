@@ -78,14 +78,14 @@ public class TiUILabel extends TiUIView
 			protected void onLayout(boolean changed, int left, int top, int right, int bottom)
 			{
 				super.onLayout(changed, left, top, right, bottom);
-				
+
 				adjustTextFontSize(this);
-				
+
 				if (proxy != null && proxy.hasListeners(TiC.EVENT_POST_LAYOUT)) {
 					proxy.fireEvent(TiC.EVENT_POST_LAYOUT, null, false);
 				}
 			}
-			
+
 			@Override
 			public boolean onTouchEvent(MotionEvent event) {
 			        TextView textView = (TextView) this;
@@ -115,7 +115,7 @@ public class TiUILabel extends TiUIView
 			                        ClickableSpan.class);
 
 							if (link.length != 0) {
-								ClickableSpan cSpan = link[0]; 
+								ClickableSpan cSpan = link[0];
 								if (action == MotionEvent.ACTION_UP) {
 									TiViewProxy proxy = getProxy();
 									if(proxy.hasListeners("link") && (cSpan instanceof URLSpan)) {
@@ -147,13 +147,13 @@ public class TiUILabel extends TiUIView
 		setNativeView(tv);
 
 	}
-	
+
 	/**
 	 * Method used to decrease the fontsize of the text to fit the width
 	 * fontsize should be >= than the property minimumFontSize
 	 * @param v
 	 */
-	private void adjustTextFontSize(View v){	
+	private void adjustTextFontSize(View v){
 		if (minimumFontSize != null){
 			TextView tv = (TextView) v;
 
@@ -169,7 +169,7 @@ public class TiUILabel extends TiUIView
 						}
 					}
 				}
-			    
+
 			    TextPaint textPaint = tv.getPaint();
 				if (textPaint != null) {
 					float stringWidth = textPaint.measureText(tv.getText().toString());
@@ -190,7 +190,7 @@ public class TiUILabel extends TiUIView
 		super.processProperties(d);
 
 		TextView tv = (TextView) getNativeView();
-		
+
 		boolean needShadow = false;
 
 		// Only accept one, html has priority
@@ -205,7 +205,7 @@ public class TiUILabel extends TiUIView
 				}
 			} else {
 				tv.setMovementMethod(null);
-				// Before Jelly Bean (API < 16), disabling the movement method will 
+				// Before Jelly Bean (API < 16), disabling the movement method will
 				// disable focusable, clickable and longclickable.
 				if (Build.VERSION.SDK_INT < TiC.API_LEVEL_JELLY_BEAN) {
 					tv.setFocusable(true);
@@ -216,7 +216,7 @@ public class TiUILabel extends TiUIView
 			}
 		} else if (d.containsKey(TiC.PROPERTY_TEXT)) {
 			tv.setText(TiConvert.toString(d,TiC.PROPERTY_TEXT), TextView.BufferType.SPANNABLE);
-			
+
 		} else if (d.containsKey(TiC.PROPERTY_TITLE)) { // For table view rows
 			tv.setText(TiConvert.toString(d,TiC.PROPERTY_TITLE), TextView.BufferType.SPANNABLE);
 		}
@@ -224,7 +224,7 @@ public class TiUILabel extends TiUIView
 		if (d.containsKey(TiC.PROPERTY_INCLUDE_FONT_PADDING)) {
 			tv.setIncludeFontPadding(TiConvert.toBoolean(d, TiC.PROPERTY_INCLUDE_FONT_PADDING, true));
  		}
- 		
+
 		if (d.containsKey(TiC.PROPERTY_MINIMUM_FONT_SIZE)) {
 			//it enables font scaling to fit and forces the label content to be limited to a single line.
 			minimumFontSize =  TiConvert.toString(d, TiC.PROPERTY_MINIMUM_FONT_SIZE);
@@ -269,7 +269,7 @@ public class TiUILabel extends TiUIView
 		}
 
 		if (d.containsKey(TiC.PROPERTY_ELLIPSIZE)) {
-			
+
 			Object value = d.get(TiC.PROPERTY_ELLIPSIZE);
 			if (value instanceof Boolean){
 				ellipsize = (Boolean) value ? TruncateAt.END : null;
@@ -277,13 +277,13 @@ public class TiUILabel extends TiUIView
 
 			if (value instanceof Integer){
 				switch((Integer)value){
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_START: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_START:
 						ellipsize = TruncateAt.START; break;
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MIDDLE: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MIDDLE:
 						ellipsize = TruncateAt.MIDDLE; break;
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_END: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_END:
 						ellipsize = TruncateAt.END; break;
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE:
 						// marquee effect only works in single line mode
 						tv.setSingleLine(true);
 						tv.setSelected(true);
@@ -327,7 +327,7 @@ public class TiUILabel extends TiUIView
 		TiUIHelper.linkifyIfEnabled(tv, d.get(TiC.PROPERTY_AUTO_LINK));
 		tv.invalidate();
 	}
-	
+
 	@Override
 	public void propertyChanged(String key, Object oldValue, Object newValue, KrollProxy proxy)
 	{
@@ -370,13 +370,13 @@ public class TiUILabel extends TiUIView
 			}
 			if (newValue instanceof Integer){
 				switch((Integer)newValue){
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_START: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_START:
 						ellipsize = TruncateAt.START; break;
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MIDDLE: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MIDDLE:
 						ellipsize = TruncateAt.MIDDLE; break;
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_END: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_END:
 						ellipsize = TruncateAt.END; break;
-					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE: 
+					case UIModule.TEXT_ELLIPSIZE_TRUNCATE_MARQUEE:
 						// marquee effect only works in single line mode
 						tv.setSingleLine(true);
 						tv.setSelected(true);
@@ -407,7 +407,7 @@ public class TiUILabel extends TiUIView
 		} else if (key.equals(TiC.PROPERTY_LINES)) {
 			tv.setLines(TiConvert.toInt(newValue));
 		} else if (key.equals(TiC.PROPERTY_MAX_LINES)) {
-			tv.setMaxLines(TiConvert.toInt(newValue));	
+			tv.setMaxLines(TiConvert.toInt(newValue));
 		} else if (key.equals(TiC.PROPERTY_ATTRIBUTED_STRING) && newValue instanceof AttributedStringProxy) {
 			Spannable spannableText = AttributedStringProxy.toSpannable(((AttributedStringProxy)newValue), TiApplication.getAppCurrentActivity());
 			if (spannableText != null) {
